@@ -22,42 +22,43 @@ function cachingDecoratorNew(func) {
 }
 
 function debounceDecoratorNew (func,ms){
-  let isThrottled = false
+    let isDebounce = false
+    let timeout
 
-  function wrapper (){
+    function wrapper (...arg){
+        clearTimeout(timeout)
 
-      if (isThrottled) { 
-          return;
-      }
+        timeout = setTimeout(function() {
+            func.apply(this, arg);
+        },ms)
 
-      func.apply(this, arguments);
-
-      isThrottled = true;
-
-      setTimeout(function() {
-          isThrottled = false;
-      },ms)
-  }
-  return wrapper
+        if(!isDebounce){
+            func.apply(this, arg);
+            isDebounce = true
+        }
+    }
+    return wrapper
 }
 
+
 function debounceDecorator2(func,ms){
-  let isThrottled = false
-  function wrapper (){
-      if (isThrottled) { 
-          wrapper.count +=1
-          return;
-      }
+    let isDebounce = false
+    let timeout
 
-      func.apply(this, arguments);
+    function wrapper (...arg){
+        clearTimeout(timeout)
 
-      isThrottled = true;
+        timeout = setTimeout(function() {
+            func.apply(this, arg);
+            wrapper.count += 1;
+        },ms)
 
-      setTimeout(function() {
-          isThrottled = false;
-          wrapper.count +=1
-      },ms)
-  }
+        if(!isDebounce){
+            func.apply(this, arg);
+            isDebounce = true
+            wrapper.count += 1;
+        }
+    }
 
   wrapper.count = 0
   return wrapper
